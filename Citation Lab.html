@@ -1,0 +1,472 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Citation Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: one column of task cards on a quiet ground; each task is a numbered step in a lab procedure. */
+:root {
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --fg: #1B2433;
+  --muted: #5B6678;
+  --accent: #1F3A5F;
+  --accent-2: #2A7F86;
+  --ok: #2E6B45;
+  --ok-bg: #E7F3EC;
+  --bad: #A23B2F;
+  --bad-bg: #F8E9E7;
+  --line: #D5DCE6;
+  --chip: #EEF2F7;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111821;
+    --surface: #18212D;
+    --fg: #E8EDF4;
+    --muted: #A6B2C3;
+    --accent: #9CC3E8;
+    --accent-2: #6FC3C9;
+    --ok: #7BC79A;
+    --ok-bg: #1B2E24;
+    --bad: #F09A8F;
+    --bad-bg: #36211E;
+    --line: #2E3A4B;
+    --chip: #223042;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111821;
+  --surface: #18212D;
+  --fg: #E8EDF4;
+  --muted: #A6B2C3;
+  --accent: #9CC3E8;
+  --accent-2: #6FC3C9;
+  --ok: #7BC79A;
+  --ok-bg: #1B2E24;
+  --bad: #F09A8F;
+  --bad-bg: #36211E;
+  --line: #2E3A4B;
+  --chip: #223042;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding-block: 32px 48px;
+  padding-inline: 16px;
+}
+h1, h2 {
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  color: var(--accent);
+  text-wrap: balance;
+  line-height: 1.2;
+}
+h1 { font-size: 44px; margin: 4px 0 8px; }
+h2 { font-size: 28px; margin: 0 0 6px; }
+p { margin: 0; }
+.kicker {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.lede { color: var(--muted); max-width: 62ch; margin-top: 8px; }
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 8px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.score { font-size: 20px; font-weight: 600; }
+.score span { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.task {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.task .hint { color: var(--muted); margin-bottom: 16px; }
+ol.items { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.item {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  display: grid;
+  gap: 10px;
+}
+.item.right { border-color: var(--ok); background: var(--ok-bg); }
+.item.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.sentence {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 19px;
+  text-wrap: pretty;
+}
+.sentence code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 17px;
+  background: var(--chip);
+  padding: 1px 6px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+.note { color: var(--fg); font-size: 18px; }
+.note[hidden] { display: none; }
+
+.segmented { display: flex; flex-wrap: wrap; gap: 8px; }
+button, select {
+  font: inherit;
+  font-size: 18px;
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-height: 44px;
+}
+select { max-width: 100%; }
+button { cursor: pointer; }
+button:hover, select:hover { border-color: var(--accent-2); }
+button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+  font-weight: 600;
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+  font-weight: 600;
+  margin-top: 16px;
+}
+button.ghost { color: var(--muted); }
+:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
+
+.radios { display: grid; gap: 8px; }
+.radios label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.radios input { margin-top: 6px; accent-color: var(--accent); }
+fieldset { border: 0; padding: 0; margin: 0; }
+legend { font-weight: 600; margin-bottom: 10px; }
+
+.cols { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.source {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--accent-2);
+  background: var(--chip);
+  border-radius: 6px;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-style: italic;
+}
+.done {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: var(--chip);
+  color: var(--fg);
+}
+.done[hidden] { display: none; }
+
+select { justify-self: start; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">Academic Writing · Week 4–5 · Citation workshop</p>
+    <h1>Citation Lab</h1>
+    <p class="lede">Four short tasks from the workshop. Make a choice, check it, and read the reason. Each check returns an explanation for every item.</p>
+  </header>
+
+  <div class="bar">
+    <p class="score" aria-live="polite">Score: <span id="score">0</span> / 13</p>
+    <button type="button" class="ghost" id="reset">Start over</button>
+  </div>
+
+  <section class="task" aria-labelledby="h-t1">
+    <h2 id="h-t1">1 · Integral or non-integral?</h2>
+    <p class="hint">Ask whether the author is the point of the sentence, or the finding is.</p>
+    <ol class="items" id="t1"></ol>
+    <button type="button" class="primary" data-check="t1">Check task 1</button>
+  </section>
+
+  <section class="task" aria-labelledby="h-flip">
+    <h2 id="h-flip">2 · Flip the citation</h2>
+    <p class="hint">Which rewrite keeps the meaning and puts the citation at the end of the sentence?</p>
+    <p class="source">“Nation (2013) argued that word knowledge is built on form, meaning, and use.”</p>
+    <fieldset style="margin-top:16px">
+      <legend>Choose one</legend>
+      <div class="radios" id="flip"></div>
+    </fieldset>
+    <p class="note" id="flip-note" hidden></p>
+    <button type="button" class="primary" data-check="flip">Check task 2</button>
+  </section>
+
+  <section class="task" aria-labelledby="h-t3">
+    <h2 id="h-t3">3 · Paraphrase triage</h2>
+    <p class="hint">Read the source, then label each version.</p>
+    <p class="source">“Smartphone and internet technologies have resulted in the appearance of the ‘Mobile learning’ (M-learning) concept.” (Yu &amp; Sukying, 2021)</p>
+    <ol class="items" id="t3" style="margin-top:16px"></ol>
+    <button type="button" class="primary" data-check="t3">Check task 3</button>
+  </section>
+
+  <section class="task" aria-labelledby="h-t4">
+    <h2 id="h-t4">4 · APA audit</h2>
+    <p class="hint">Each line comes from a published source or a unit slide. Choose the APA 7 version.</p>
+    <ol class="items" id="t4"></ol>
+    <button type="button" class="primary" data-check="t4">Check task 4</button>
+  </section>
+
+  <div class="done" id="done" hidden>
+    <p><strong>All four tasks checked.</strong> Compare your answers with a partner, then rewrite one sentence from your HW3 draft using the same moves.</p>
+  </div>
+</div>
+
+<script>
+const T1 = [
+  { text: 'Nation (2013) argued that word knowledge is built on form, meaning, and use.', answer: 'integral', why: 'The researcher is the subject, and the sentence reports his claim. That makes it integral.' },
+  { text: 'Smartphones have changed how students learn foreign languages (Hu, 2013; Rezaei et al., 2014).', answer: 'non', why: 'The finding is the point. The sources sit at the end as support.' },
+  { text: 'According to Hofstede (1983), national values differ on four major dimensions.', answer: 'integral', why: 'The researcher and his framework are the focus, so the author name sits in the sentence.' },
+  { text: 'Vocabulary is a critical part of the English learning process (Nation, 2013; Schmitt, 2010).', answer: 'non', why: 'A background fact. The content leads, and the authors sit in parentheses.' },
+];
+
+const FLIP = [
+  { text: 'Word knowledge is built on form, meaning, and use (Nation, 2013).', ok: true, why: 'Correct. The claim leads and the citation closes the sentence, which makes it non-integral.' },
+  { text: 'Nation (2013) word knowledge is built on form, meaning, and use.', ok: false, why: 'The author name is still in the sentence, so the citation stays integral. The sentence also reads poorly.' },
+  { text: 'Word knowledge is built on form, meaning, and use, Nation (2013) argued.', ok: false, why: 'Nation is still the subject of a reporting verb. This is integral, not non-integral.' },
+];
+
+const T3 = [
+  { text: 'Smartphone and internet technologies have led to the emergence of the “mobile learning” concept (Kukulska-Hulme & Shield, 2008; Reinders & White, 2011).', answer: 'Patchwriting', why: 'Synonyms are swapped and the structure is kept. A citation does not fix close copying.' },
+  { text: 'The rise of smartphones and internet access has given birth to mobile learning, commonly abbreviated as M-learning (Kukulska-Hulme & Shield, 2008; Reinders & White, 2011).', answer: 'Acceptable paraphrase', why: 'Reworded in new structure, with the idea cited.' },
+  { text: 'The rise of mobile learning has been driven by smartphone and internet technologies.', answer: 'Missing citation', why: 'The wording is new, but the idea still belongs to the source, so it needs a citation.' },
+];
+const T3_OPTIONS = ['Patchwriting', 'Acceptable paraphrase', 'Missing citation'];
+
+const T4 = [
+  { shown: '(Nation, 2013: 78)', opts: ['(Nation, 2013, p. 78)', '(Nation, 2013, 78)', '(Nation 2013 p.78)'], answer: 0, why: 'APA 7 uses a comma and “p.” for one page. No colon goes before the page number.' },
+  { shown: '(Hu, 2013: 139-154)', opts: ['(Hu, 2013, p. 139-154)', '(Hu, 2013, pp. 139–154)', '(Hu & 2013, 139–154)'], answer: 1, why: 'Use “pp.” for a page range, with an en dash between the numbers.' },
+  { shown: '(Kukulska-Hulme & Shield, 2008:271-289)', opts: ['(Kukulska-Hulme & Shield, 2008, pp. 271–289)', '(Kukulska-Hulme and Shield, 2008, pp. 271–289)', '(Kukulska-Hulme & Shield 2008 271-289)'], answer: 0, why: 'Use “&” inside parentheses, a comma after the year, and “pp.” with an en dash.' },
+  { shown: 'Reinders& White, 2011', opts: ['Reinders&White, 2011', 'Reinders & White, 2011', 'Reinders, & White, 2011'], answer: 1, why: 'Put a space on each side of the ampersand.' },
+  { shown: 'McDonough (1983) quoted directly, with no page number', opts: ['Add a page number: (McDonough, 1983, p. X)', 'Add a URL to the citation', 'Put the quotation in italics'], answer: 0, why: 'APA 7 requires a page number for every direct quotation.' },
+];
+
+const state = { t1: {}, flip: null, t3: {}, t4: {} };
+const results = { t1: null, flip: null, t3: null, t4: null };
+const TOTAL = T1.length + 1 + T3.length + T4.length;
+
+function mark(li, ok, why) {
+  li.classList.toggle('right', ok);
+  li.classList.toggle('wrong', !ok);
+  const note = li.querySelector('.note');
+  note.textContent = (ok ? 'Correct. ' : 'Not quite. ') + why;
+  note.hidden = false;
+}
+
+function renderT1() {
+  const ol = document.getElementById('t1');
+  T1.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.className = 'item';
+    const p = document.createElement('p');
+    p.className = 'sentence';
+    p.textContent = it.text;
+    const group = document.createElement('div');
+    group.className = 'segmented';
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', 'Citation type');
+    [['integral', 'Integral'], ['non', 'Non-integral']].forEach(([v, label]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label;
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', () => {
+        state.t1[i] = v;
+        group.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      });
+      group.appendChild(b);
+    });
+    const note = document.createElement('p');
+    note.className = 'note';
+    note.hidden = true;
+    li.append(p, group, note);
+    ol.appendChild(li);
+  });
+}
+
+function renderFlip() {
+  const box = document.getElementById('flip');
+  FLIP.forEach((opt, i) => {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'flip';
+    input.value = String(i);
+    input.addEventListener('change', () => { state.flip = i; });
+    const span = document.createElement('span');
+    span.textContent = opt.text;
+    label.append(input, span);
+    box.appendChild(label);
+  });
+}
+
+function renderT3() {
+  const ol = document.getElementById('t3');
+  T3.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.className = 'item';
+    const p = document.createElement('p');
+    p.className = 'sentence';
+    p.textContent = it.text;
+    const sel = document.createElement('select');
+    sel.setAttribute('aria-label', 'Label for version ' + String.fromCharCode(65 + i));
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = 'Choose a label';
+    sel.appendChild(first);
+    T3_OPTIONS.forEach((o) => {
+      const opt = document.createElement('option');
+      opt.value = o;
+      opt.textContent = o;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => { state.t3[i] = sel.value; });
+    const note = document.createElement('p');
+    note.className = 'note';
+    note.hidden = true;
+    li.append(p, sel, note);
+    ol.appendChild(li);
+  });
+}
+
+function renderT4() {
+  const ol = document.getElementById('t4');
+  T4.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.className = 'item';
+    const shown = document.createElement('p');
+    shown.className = 'sentence';
+    const code = document.createElement('code');
+    code.textContent = it.shown;
+    shown.appendChild(code);
+    const sel = document.createElement('select');
+    sel.setAttribute('aria-label', 'Corrected form for item ' + (i + 1));
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = 'Choose the APA 7 form';
+    sel.appendChild(first);
+    it.opts.forEach((o, j) => {
+      const opt = document.createElement('option');
+      opt.value = String(j);
+      opt.textContent = o;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => { state.t4[i] = sel.value; });
+    const note = document.createElement('p');
+    note.className = 'note';
+    note.hidden = true;
+    li.append(shown, sel, note);
+    ol.appendChild(li);
+  });
+}
+
+function checkTask(key) {
+  let correct = 0;
+  if (key === 't1') {
+    document.querySelectorAll('#t1 > li').forEach((li, i) => {
+      const ok = state.t1[i] === T1[i].answer;
+      if (ok) correct++;
+      mark(li, ok, ok ? T1[i].why : (state.t1[i] ? T1[i].why : 'Choose an answer first. ' + T1[i].why));
+    });
+  } else if (key === 'flip') {
+    const ok = state.flip !== null && FLIP[state.flip].ok;
+    if (ok) correct = 1;
+    const note = document.getElementById('flip-note');
+    if (state.flip === null) {
+      note.textContent = 'Choose one option first.';
+    } else {
+      note.textContent = (ok ? 'Correct. ' : 'Not quite. ') + FLIP[state.flip].why;
+    }
+    note.hidden = false;
+    note.style.color = ok ? 'var(--ok)' : 'var(--bad)';
+  } else if (key === 't3') {
+    document.querySelectorAll('#t3 > li').forEach((li, i) => {
+      const ok = state.t3[i] === T3[i].answer;
+      if (ok) correct++;
+      mark(li, ok, T3[i].why);
+    });
+  } else if (key === 't4') {
+    document.querySelectorAll('#t4 > li').forEach((li, i) => {
+      const ok = state.t4[i] !== undefined && state.t4[i] !== '' && Number(state.t4[i]) === T4[i].answer;
+      if (ok) correct++;
+      mark(li, ok, T4[i].why);
+    });
+  }
+  results[key] = correct;
+  updateScore();
+}
+
+function updateScore() {
+  const total = Object.values(results).reduce((a, b) => a + (b || 0), 0);
+  document.getElementById('score').textContent = String(total);
+  const allChecked = Object.values(results).every((v) => v !== null);
+  document.getElementById('done').hidden = !allChecked;
+}
+
+function reset() {
+  state.t1 = {}; state.flip = null; state.t3 = {}; state.t4 = {};
+  Object.keys(results).forEach((k) => { results[k] = null; });
+  document.querySelectorAll('.item').forEach((li) => {
+    li.classList.remove('right', 'wrong');
+    li.querySelector('.note').hidden = true;
+  });
+  document.querySelectorAll('button[aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+  document.querySelectorAll('select').forEach((s) => { s.value = ''; });
+  document.querySelectorAll('input[name="flip"]').forEach((r) => { r.checked = false; });
+  const fn = document.getElementById('flip-note');
+  fn.hidden = true;
+  updateScore();
+}
+
+renderT1();
+renderFlip();
+renderT3();
+renderT4();
+
+document.querySelectorAll('[data-check]').forEach((btn) => {
+  btn.addEventListener('click', () => checkTask(btn.dataset.check));
+});
+document.getElementById('reset').addEventListener('click', reset);
+updateScore();
+</script>
+
+</body></html>
